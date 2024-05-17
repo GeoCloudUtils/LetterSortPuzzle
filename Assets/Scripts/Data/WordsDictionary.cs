@@ -1,7 +1,5 @@
 using Newtonsoft.Json;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -28,28 +26,33 @@ public class WordsDictionary : ScriptableObject
         words = wordList.words;
     }
 
-    public string GetWord()
+    public string[] GetWords()
     {
         int next = PlayerPrefs.GetInt("NEXT", 0);
         if (next > words.Count - 1)
         {
-            Debug.Log("1");
             PlayerPrefs.SetInt("NEXT", 0);
             LoadFromJSON(PlayerPrefs.GetInt("DIFFICULTY", 0) == 0 ? Difficulty.MEDIUM : Difficulty.HARD);
         }
-        return words[next];
+        PlayerPrefs.SetInt("NEXT", next + 2);
+        string[] wordsArr = new string[]
+        {
+            words[next],
+            words[next + 1],
+        };
+        return wordsArr;
     }
-}
 
-[System.Serializable]
-public class WordsCollection
-{
-    public Difficulty Difficulty;
-    public TextAsset WordCollection;
-}
+    [System.Serializable]
+    public class WordsCollection
+    {
+        public Difficulty Difficulty;
+        public TextAsset WordCollection;
+    }
 
-[System.Serializable]
-public class WordList
-{
-    public List<string> words;
+    [System.Serializable]
+    public class WordList
+    {
+        public List<string> words;
+    }
 }

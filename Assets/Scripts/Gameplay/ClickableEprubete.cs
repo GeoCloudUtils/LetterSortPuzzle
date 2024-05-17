@@ -9,6 +9,9 @@ using UnityEngine.UI;
 
 namespace Gameplay
 {
+    /// <summary>
+    /// Eprubete logic
+    /// </summary>
     public class ClickableEprubete : MonoBehaviour
     {
         [SerializeField] private Button eprubeteButton;
@@ -26,6 +29,9 @@ namespace Gameplay
             eprubeteButton.onClick.AddListener(OnClick);
         }
 
+        /// <summary>
+        /// Handles eprubete click callback
+        /// </summary>
         private void OnClick()
         {
             letterBalls ??= new List<LetterBall>();
@@ -33,17 +39,29 @@ namespace Gameplay
             OnSelect?.Invoke(selectedBall, this);
         }
 
+        /// <summary>
+        /// Handles letter remove callback
+        /// </summary>
+        /// <param name="letter"></param>
         public void RemoveLetter(LetterBall letter)
         {
             letterBalls.Remove(letter);
         }
 
+        /// <summary>
+        /// Add cell
+        /// </summary>
+        /// <param name="cell"></param>
         public void AddCell(Transform cell)
         {
             cells ??= new List<Transform>();
             cells.Add(cell);
         }
 
+        /// <summary>
+        /// Adding letter to eprubete cell
+        /// </summary>
+        /// <param name="letterBall"></param>
         public void AddLetterBall(LetterBall letterBall)
         {
             for (int i = cells.Count - 1; i >= 0; i--)
@@ -60,6 +78,10 @@ namespace Gameplay
             Debug.LogWarning("No empty cell found to move the letter ball to.");
         }
 
+        /// <summary>
+        /// Ball move
+        /// </summary>
+        /// <param name="letterBall"></param>
         public void DoLetterPath(LetterBall letterBall)
         {
             Transform targetCell = null;
@@ -80,6 +102,10 @@ namespace Gameplay
             });
         }
 
+        /// <summary>
+        /// Check's if eprubete is full
+        /// </summary>
+        /// <returns></returns>
         public bool IsFull()
         {
             for (int i = cells.Count - 1; i >= 0; i--)
@@ -92,6 +118,10 @@ namespace Gameplay
             return true;
         }
 
+        /// <summary>
+        /// Check eprubete vertical string
+        /// </summary>
+        /// <returns></returns>
         public string GetVerticalString()
         {
             string verticalString = "";
@@ -106,6 +136,10 @@ namespace Gameplay
             return verticalString;
         }
 
+        /// <summary>
+        /// Get top cell of eprubete
+        /// </summary>
+        /// <returns></returns>
         public Transform GetUpCell()
         {
             return cells[0].transform;

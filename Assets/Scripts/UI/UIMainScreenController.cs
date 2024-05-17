@@ -64,7 +64,7 @@ namespace UI
 
             levelText.SetText(level.ToString());
             crystalsText.SetText(crystals.ToString());
-            difficultyText.SetText("Difficulty: easy");//change
+            difficultyText.SetText("Difficulty: easy");
         }
 
         public override void Hide()

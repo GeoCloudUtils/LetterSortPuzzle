@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Gameplay
 {
+    /// <summary>
+    /// Letter ball logic
+    /// </summary>
     public class LetterBall : MonoBehaviour
     {
         [SerializeField] private TMP_Text letterText;
@@ -15,16 +18,27 @@ namespace Gameplay
 
         public bool IsMoving { get => isMoving; private set => isMoving = value; }
 
+        /// <summary>
+        /// Set letter
+        /// </summary>
+        /// <param name="text"></param>
         public void SetText(string text)
         {
             letterText.text = text;
         }
 
+        /// <summary>
+        /// Set ball size delta
+        /// </summary>
+        /// <param name="size"></param>
         public void SetSize(float size)
         {
             rectTransform.sizeDelta = new Vector2(size, size);
         }
 
+        /// <summary>
+        /// Moving ball on select
+        /// </summary>
         public void MoveUp()
         {
             if (IsMoving)
@@ -39,6 +53,10 @@ namespace Gameplay
             });
         }
 
+        /// <summary>
+        /// Detach from parent
+        /// </summary>
+        /// <param name="eprubete"></param>
         public void DetachParent(ClickableEprubete eprubete)
         {
             transform.SetParent(eprubete.transform);

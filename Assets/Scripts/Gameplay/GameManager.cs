@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Gameplay
@@ -38,8 +39,13 @@ namespace Gameplay
 
         public bool Initialized { get => initialized; private set => initialized = value; }
 
-        private string word_1;
-        private string word_2;
+        public string FirstWord { get => firstWord; private set => firstWord = value; }
+        public string SecondWord { get => secondWord; private set => secondWord = value; }
+
+        private string firstWord;
+        private string secondWord;
+
+        public bool canClick = false;
 
         private void Awake()
         {
@@ -49,23 +55,23 @@ namespace Gameplay
         /// <summary>
         /// Initialize gameplay
         /// </summary>
-        public void Initialize()
+        public async Task InitializeAsync()
         {
             initialized = true;
             string[] words = wordsDictionary.GetWords();
-            word_1 = words[0];
-            word_2 = words[1];
+            FirstWord = words[0];
+            SecondWord = words[1];
             eprubeteList = new List<ClickableEprubete>();
-            CreateEprubete();
-            SpawnBallLetters();
+            await CreateEprubeteAsync();
+            await SpawnBallLettersAsync();
         }
 
         /// <summary>
         /// Create eprubete at runtime
         /// </summary>
-        private void CreateEprubete()
+        private async Task CreateEprubeteAsync()
         {
-            int height = word_1.Length;
+            int height = FirstWord.Length;
             for (int i = 0; i < xPositions.Length; i++)
             {
                 ClickableEprubete eprubete = Instantiate(eprubetePrefab);
@@ -78,12 +84,14 @@ namespace Gameplay
                     eprubete.AddCell(cell.transform);
                 }
                 eprubete.transform.SetParent(parent.transform);
+                eprubete.transform.localScale = Vector3.one;
                 Vector3 pos = Vector3.zero;
                 pos.x = xPositions[i];
                 eprubete.transform.localPosition = pos;
                 eprubete.OnSelect += HandleLetterSelect;
                 eprubete.DispatchMoveComplete += MoveComplete;
             }
+            await Task.Yield(); // Simulate asynchronous work
         }
 
         /// <summary>
@@ -97,13 +105,17 @@ namespace Gameplay
                 Debug.Log("Level Complete!");
                 return;
             }
+            if(eprubete.GetVerticalString() == FirstWord || eprubete.GetVerticalString() == SecondWord)
+            {
+                eprubete.Lock();
+            }
             isMoving = false;
         }
 
         private bool IsComplete()
         {
             int count = eprubeteList.Count(eprubete =>
-            eprubete.GetVerticalString() == word_1 || eprubete.GetVerticalString() == word_2);
+            eprubete.GetVerticalString() == FirstWord || eprubete.GetVerticalString() == SecondWord);
             return count > 1;
         }
 
@@ -114,7 +126,7 @@ namespace Gameplay
         /// <param name="eprubete"></param>
         private void HandleLetterSelect(LetterBall letterBall, ClickableEprubete eprubete)
         {
-            if (isMoving) return;
+            if (isMoving || !canClick) return;
 
             if (selectedEprubete == null)
             {
@@ -142,9 +154,9 @@ namespace Gameplay
         /// <summary>
         /// Spawn letters
         /// </summary>
-        private void SpawnBallLetters()
+        private async Task SpawnBallLettersAsync()
         {
-            string allLetters = word_1 + word_2;
+            string allLetters = FirstWord + SecondWord;
 
             foreach (char letter in allLetters)
             {
@@ -161,7 +173,7 @@ namespace Gameplay
                 eprubete.AddLetterBall(letterBall);
                 letterBall.SetText(letter.ToString());
             }
+            await Task.Yield(); // Simulate asynchronous work
         }
-
     }
 }

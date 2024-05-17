@@ -46,7 +46,7 @@ namespace Gameplay
                 return;
             }
             IsMoving = true;
-            Vector3 p = new Vector3(lastEprupete.transform.position.x, lastEprupete.GetUpCell().position.y + 200f, 0);
+            Vector3 p = new Vector3(lastEprupete.transform.position.x, lastEprupete.GetUpCell().position.y + 0.75f, 0);
             rectTransform.DOMoveY(p.y, 0.25f).SetEase(Ease.OutExpo).OnComplete(() =>
             {
                 IsMoving = false;

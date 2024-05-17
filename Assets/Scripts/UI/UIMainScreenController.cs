@@ -18,6 +18,8 @@ namespace UI
 
         [SerializeField] private UIGameplayScreen gameplayScreen;
 
+        private bool canClick = true;
+
         private void Start()
         {
             playButton.OnClick.AddListener(Play);
@@ -31,28 +33,49 @@ namespace UI
 
         private void OpenSettings()
         {
-
+            if (!canClick) return;
+            if (gameplayScreen.IsActive)
+            {
+                return;
+            }
         }
 
         private void OpenShop()
         {
-
+            if (!canClick) return;
+            if (gameplayScreen.IsActive)
+            {
+                return;
+            }
         }
 
         private void Share()
         {
-
+            if (!canClick) return;
+            if (gameplayScreen.IsActive)
+            {
+                return;
+            }
         }
 
         private void Rate()
         {
-
+            if (!canClick) return;
+            if (gameplayScreen.IsActive)
+            {
+                return;
+            }
         }
 
         private void Play()
         {
+            if (!canClick) return;
+            if (gameplayScreen.IsActive)
+            {
+                return;
+            }
+            canClick = false;
             gameplayScreen.Show();
-            this.Hide();
         }
 
         public override void Show()
@@ -65,6 +88,7 @@ namespace UI
             levelText.SetText(level.ToString());
             crystalsText.SetText(crystals.ToString());
             difficultyText.SetText("Difficulty: easy");
+            canClick = true;
         }
 
         public override void Hide()

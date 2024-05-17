@@ -24,6 +24,8 @@ namespace Gameplay
 
         public event Action<ClickableEprubete> DispatchMoveComplete;
 
+        private bool isLocked = false;
+
         private void Awake()
         {
             eprubeteButton.onClick.AddListener(OnClick);
@@ -34,6 +36,7 @@ namespace Gameplay
         /// </summary>
         private void OnClick()
         {
+            if (isLocked) return;
             letterBalls ??= new List<LetterBall>();
             LetterBall selectedBall = letterBalls.Count > 0 ? letterBalls.Last() : null;
             OnSelect?.Invoke(selectedBall, this);
@@ -70,7 +73,7 @@ namespace Gameplay
                 {
                     letterBall.transform.position = cells[i].position;
                     letterBall.transform.SetParent(cells[i]);
-
+                    letterBall.transform.localScale = Vector3.one;
                     letterBalls.Add(letterBall);
                     return;
                 }
@@ -100,6 +103,11 @@ namespace Gameplay
                 letterBall.transform.DOLocalMove(Vector3.zero, 0.25f).SetEase(Ease.OutExpo).OnComplete(() => DispatchMoveComplete?.Invoke(this));
                 letterBalls.Add(letterBall);
             });
+        }
+
+        public void Lock()
+        {
+            isLocked = true;
         }
 
         /// <summary>

@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Gameplay
 {
@@ -103,6 +105,8 @@ namespace Gameplay
             if (IsComplete())
             {
                 Debug.Log("Level Complete!");
+                SessionState.SetInt("LEVEL_UP", 1);
+                SceneManager.LoadScene("Main");
                 return;
             }
             if(eprubete.GetVerticalString() == FirstWord || eprubete.GetVerticalString() == SecondWord)

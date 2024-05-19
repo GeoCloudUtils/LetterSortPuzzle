@@ -1,6 +1,7 @@
 using Lean.Gui;
 using TMPro;
 using UI.Base;
+using UnityEditor;
 using UnityEngine;
 namespace UI
 {
@@ -27,8 +28,14 @@ namespace UI
             shareButton.OnClick.AddListener(Share);
             shopButton.OnClick.AddListener(OpenShop);
             settingsButton.OnClick.AddListener(OpenSettings);
-
-            Show();
+            if (SessionState.GetInt("LEVEL_UP", 0) == 0)
+            {
+                Show();
+            }
+            else
+            {
+                Play();
+            }
         }
 
         private void OpenSettings()

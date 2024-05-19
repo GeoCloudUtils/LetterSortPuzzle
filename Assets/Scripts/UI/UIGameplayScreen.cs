@@ -1,7 +1,6 @@
 using DG.Tweening;
 using Gameplay;
 using Lean.Gui;
-using System;
 using System.Threading.Tasks;
 using UI.Base;
 using UnityEngine;
@@ -74,7 +73,7 @@ namespace UI
             {
                 WordCell wordCell = Instantiate(wordCellPrefab, parent);
                 wordCell.transform.localScale = Vector3.one;
-                wordCell.SetLetter(word[i].ToString(), UnityEngine.Random.value > 0.5f);
+                wordCell.SetLetter(word[i].ToString(), false); //UnityEngine.Random.value > 0.5f);
             }
             await Task.Yield();
         }

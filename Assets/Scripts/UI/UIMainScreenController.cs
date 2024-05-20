@@ -28,7 +28,7 @@ namespace UI
             shareButton.OnClick.AddListener(Share);
             shopButton.OnClick.AddListener(OpenShop);
             settingsButton.OnClick.AddListener(OpenSettings);
-            if (SessionState.GetInt("LEVEL_UP", 0) == 0)
+            if (PlayerPrefs.GetInt("LEVEL_UP", 0) == 0)
             {
                 Show();
             }
@@ -36,6 +36,10 @@ namespace UI
             {
                 Play();
             }
+        }
+        private void OnApplicationQuit()
+        {
+            PlayerPrefs.SetInt("LEVEL_UP", 0);
         }
 
         private void OpenSettings()

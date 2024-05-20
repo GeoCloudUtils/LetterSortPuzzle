@@ -104,9 +104,9 @@ namespace Gameplay
         {
             if (IsComplete())
             {
-                if (SessionState.GetInt("LEVEL_UP", 0) == 0)
+                if (PlayerPrefs.GetInt("LEVEL_UP", 0) == 0)
                 {
-                    SessionState.SetInt("LEVEL_UP", 1);
+                    PlayerPrefs.SetInt("LEVEL_UP", 1);
                 }
                 SceneManager.LoadScene("Main");
                 return;

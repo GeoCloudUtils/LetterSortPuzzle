@@ -104,18 +104,24 @@ namespace Gameplay
         {
             if (IsComplete())
             {
-                Debug.Log("Level Complete!");
-                SessionState.SetInt("LEVEL_UP", 1);
+                if (SessionState.GetInt("LEVEL_UP", 0) == 0)
+                {
+                    SessionState.SetInt("LEVEL_UP", 1);
+                }
                 SceneManager.LoadScene("Main");
                 return;
             }
-            if(eprubete.GetVerticalString() == FirstWord || eprubete.GetVerticalString() == SecondWord)
+            if (eprubete.GetVerticalString() == FirstWord || eprubete.GetVerticalString() == SecondWord)
             {
                 eprubete.Lock();
             }
             isMoving = false;
         }
 
+        /// <summary>
+        /// Check for level complete
+        /// </summary>
+        /// <returns></returns>
         private bool IsComplete()
         {
             int count = eprubeteList.Count(eprubete =>

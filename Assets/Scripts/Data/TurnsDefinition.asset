@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95a69ac3508d664428d46a44aa5650f7, type: 3}
+  m_Name: TurnsDefinition
+  m_EditorClassIdentifier: 
+  shopDefinitions:
+  - Level: 0
+    Sprite: {fileID: 21300000, guid: b2e35907ade1942fe92b86c6d43a5a04, type: 3}
+    Price: 0
+  - Level: 4
+    Sprite: {fileID: 21300000, guid: b2e35907ade1942fe92b86c6d43a5a04, type: 3}
+    Price: 45
+  - Level: 7
+    Sprite: {fileID: 21300000, guid: b2e35907ade1942fe92b86c6d43a5a04, type: 3}
+    Price: 89
+  - Level: 12
+    Sprite: {fileID: 21300000, guid: b2e35907ade1942fe92b86c6d43a5a04, type: 3}
+    Price: 124

@@ -4,6 +4,7 @@ using Lean.Gui;
 using System.Threading.Tasks;
 using UI.Base;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UI
 {
@@ -12,6 +13,11 @@ namespace UI
         [SerializeField] private LeanButton homeButton;
         [SerializeField] private LeanButton stepBackButton;
         [SerializeField] private LeanButton tipsButton;
+
+        [SerializeField] private Backgrounds backgrounds;
+
+        [SerializeField] private Image topBgImage;
+        [SerializeField] private Image bodyIamge;
 
         [SerializeField] private UIMainScreenController mainScreen;
 
@@ -42,6 +48,14 @@ namespace UI
         private void GoOneStepBack()
         {
 
+        }
+
+        private void SetBg()
+        {
+            string bgName = PlayerPrefs.GetString("BG","bg1");
+            BackgroundItem bgItem = backgrounds.GetBackgroundByName(bgName);
+            bodyIamge.color = bgItem.bodyColor;
+            topBgImage.sprite = bgItem.background;
         }
 
         private void Home()
@@ -95,6 +109,7 @@ namespace UI
             }
             gameManager.canClick = true;
             canClick = true;
+            SetBg();
         }
 
         public override void Hide()

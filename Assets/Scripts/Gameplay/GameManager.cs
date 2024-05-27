@@ -111,12 +111,16 @@ namespace Gameplay
                 SceneManager.LoadScene("Main");
                 return;
             }
-            if (eprubete.GetVerticalString() == FirstWord || eprubete.GetVerticalString() == SecondWord)
+            string verticalString = eprubete.GetVerticalString();
+            string reversedString = new string(verticalString.Reverse().ToArray());
+
+            if (verticalString == FirstWord || verticalString == SecondWord || reversedString == FirstWord || reversedString == SecondWord)
             {
                 eprubete.Lock();
             }
             isMoving = false;
         }
+
 
         /// <summary>
         /// Check for level complete

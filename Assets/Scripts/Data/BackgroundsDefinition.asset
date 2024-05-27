@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95a69ac3508d664428d46a44aa5650f7, type: 3}
+  m_Name: BackgroundsDefinition
+  m_EditorClassIdentifier: 
+  shopDefinitions:
+  - Level: 0
+    Sprite: {fileID: 21300000, guid: 1a7eda1adf3798d4c91e9495327f91a5, type: 3}
+    Price: 50
+  - Level: 7
+    Sprite: {fileID: 21300000, guid: b9c20f68ca5fd974aa2174baad51a26b, type: 3}
+    Price: 75
+  - Level: 10
+    Sprite: {fileID: 21300000, guid: cd6c295a377645544b110ba73e0bb1bd, type: 3}
+    Price: 100
+  - Level: 15
+    Sprite: {fileID: 21300000, guid: 737d6844d8ca6df49a80058af3bb477f, type: 3}
+    Price: 145
+  - Level: 25
+    Sprite: {fileID: 21300000, guid: 85d148617b119f64585ede0b7c803d55, type: 3}
+    Price: 225

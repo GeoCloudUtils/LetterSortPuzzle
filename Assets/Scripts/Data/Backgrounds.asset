@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f138c686b2907d4d8843b08c1d7ec28, type: 3}
+  m_Name: Backgrounds
+  m_EditorClassIdentifier: 
+  backrounds:
+  - background: {fileID: 21300000, guid: 1a7eda1adf3798d4c91e9495327f91a5, type: 3}
+    bodyColor: {r: 0.07058824, g: 0.1137255, b: 0.19215688, a: 1}
+  - background: {fileID: 21300000, guid: b9c20f68ca5fd974aa2174baad51a26b, type: 3}
+    bodyColor: {r: 0.03137255, g: 0.0627451, b: 0.1137255, a: 1}
+  - background: {fileID: 21300000, guid: cd6c295a377645544b110ba73e0bb1bd, type: 3}
+    bodyColor: {r: 0.027450982, g: 0.03529412, b: 0.09411766, a: 1}
+  - background: {fileID: 21300000, guid: 737d6844d8ca6df49a80058af3bb477f, type: 3}
+    bodyColor: {r: 0, g: 0.10588236, b: 0.18823531, a: 1}
+  - background: {fileID: 21300000, guid: 85d148617b119f64585ede0b7c803d55, type: 3}
+    bodyColor: {r: 0, g: 0, b: 0, a: 1}
+  - background: {fileID: 21300000, guid: 8db2fef36d4683545bacca65d7d59128, type: 3}
+    bodyColor: {r: 0.18823531, g: 0.14117648, b: 0.227451, a: 1}
+  - background: {fileID: 21300000, guid: 328f029072cf7b44fb05c47662951279, type: 3}
+    bodyColor: {r: 0.015686275, g: 0.07058824, b: 0.07450981, a: 1}
+  - background: {fileID: 21300000, guid: 0853a15d982f7544986e5e78583d36ee, type: 3}
+    bodyColor: {r: 0.10980393, g: 0.003921569, b: 0.023529414, a: 1}
+  - background: {fileID: 21300000, guid: faf182b01e1c335428f736fb94eeaee2, type: 3}
+    bodyColor: {r: 0.09411766, g: 0.07058824, b: 0.11764707, a: 1}
+  - background: {fileID: 21300000, guid: 5492e3dcf71bfb04fabc0a96ed44529e, type: 3}
+    bodyColor: {r: 0.16862746, g: 0.09019608, b: 0.19607845, a: 1}
+  - background: {fileID: 21300000, guid: 372fef5117b52814d97dff7dab9b15dc, type: 3}
+    bodyColor: {r: 0.8862746, g: 0.8862746, b: 0.8862746, a: 1}
+  - background: {fileID: 21300000, guid: 1905ce7b61b8d6e4ab904dd354b3ae28, type: 3}
+    bodyColor: {r: 0.7725491, g: 0.4666667, b: 0.4666667, a: 1}

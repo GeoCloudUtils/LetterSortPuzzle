@@ -1,4 +1,5 @@
 using Lean.Gui;
+using System;
 using TMPro;
 using UI.Base;
 using UnityEditor;
@@ -14,12 +15,16 @@ namespace UI
         [SerializeField] private LeanButton settingsButton;
 
         [SerializeField] private TMP_Text levelText;
-        [SerializeField] private TMP_Text crystalsText;
+        [SerializeField] private TMP_Text coinsText;
         [SerializeField] private TMP_Text difficultyText;
 
         [SerializeField] private UIGameplayScreen gameplayScreen;
+        [SerializeField] private UIShopScreen shopScreen;
+        [SerializeField] private UISettingsScreen settingScreen;
 
         private bool canClick = true;
+
+        public int coins;
 
         private void Start()
         {
@@ -28,6 +33,9 @@ namespace UI
             shareButton.OnClick.AddListener(Share);
             shopButton.OnClick.AddListener(OpenShop);
             settingsButton.OnClick.AddListener(OpenSettings);
+            shopScreen.OnClose += HandleShopScreenClose;
+
+            PlayerPrefs.SetInt("COINS", coins);
             if (PlayerPrefs.GetInt("LEVEL_UP", 0) == 0)
             {
                 Show();
@@ -37,6 +45,12 @@ namespace UI
                 Play();
             }
         }
+
+        private void HandleShopScreenClose()
+        {
+            Show();
+        }
+
         private void OnApplicationQuit()
         {
             PlayerPrefs.SetInt("LEVEL_UP", 0);
@@ -49,6 +63,7 @@ namespace UI
             {
                 return;
             }
+            settingScreen.Show();
         }
 
         private void OpenShop()
@@ -58,6 +73,8 @@ namespace UI
             {
                 return;
             }
+            shopScreen.Show();
+            Hide();
         }
 
         private void Share()
@@ -94,10 +111,10 @@ namespace UI
             base.Show();
 
             int level = PlayerPrefs.GetInt("LEVEL", 1);
-            int crystals = PlayerPrefs.GetInt("CRYSTALS", 0);
+            int coins = PlayerPrefs.GetInt("COINS", 0);
 
-            levelText.SetText(level.ToString());
-            crystalsText.SetText(crystals.ToString());
+            levelText.SetText("Lvl:" + level.ToString());
+            coinsText.SetText(coins.ToString());
             difficultyText.SetText("Difficulty: easy");
             canClick = true;
         }

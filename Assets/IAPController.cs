@@ -60,7 +60,7 @@ public class IAPController: MonoBehaviour, IDetailedStoreListener
     private async Task Init()
     {
         string environment = "dev";
-#if !PROD_BUILD
+#if PROD_BUILD
         environment = "prod";
 #endif
         try
@@ -106,7 +106,7 @@ public class IAPController: MonoBehaviour, IDetailedStoreListener
     {
         if (IsCurrentStoreSupportedByValidator())
         {
-#if true//!UNITY_EDITOR
+#if !UNITY_EDITOR
                 var appleTangleData = _useAppleStoreKitTestCertificate ? AppleStoreKitTestTangle.Data() : AppleTangle.Data();
                 _validator = new CrossPlatformValidator(GooglePlayTangle.Data(), appleTangleData, Application.identifier);
 #endif
@@ -228,7 +228,7 @@ public class IAPController: MonoBehaviour, IDetailedStoreListener
     private bool ValidatePurchase(Product product)
     {
         // If we the validator doesn't support the current store, we assume the purchase is valid
-        if (IsCurrentStoreSupportedByValidator())
+        if (IsCurrentStoreSupportedByValidator() && _validator != null)
         {
             try
             {

@@ -1,6 +1,7 @@
 using DG.Tweening;
 using Gameplay;
 using Lean.Gui;
+using System;
 using System.Threading.Tasks;
 using UI.Base;
 using UnityEngine;
@@ -10,9 +11,7 @@ namespace UI
 {
     public class UIGameplayScreen : UIScreen
     {
-        [SerializeField] private LeanButton homeButton;
-        [SerializeField] private LeanButton stepBackButton;
-        [SerializeField] private LeanButton tipsButton;
+        [SerializeField] private BottomButtonsHandler bottomHandler;
 
         [SerializeField] private Backgrounds backgrounds;
 
@@ -21,7 +20,7 @@ namespace UI
 
         [SerializeField] private UIMainScreenController mainScreen;
 
-        [SerializeField] private GameManager gameManager;
+        [SerializeField] private GameplayManager gameManager;
 
         [SerializeField] private RectTransform firstWordLayout;
         [SerializeField] private RectTransform secondWordLayout;
@@ -35,9 +34,9 @@ namespace UI
 
         private void Start()
         {
-            homeButton.OnClick.AddListener(Home);
-            stepBackButton.OnClick.AddListener(GoOneStepBack);
-            tipsButton.OnClick.AddListener(ShowTips);
+            bottomHandler.OnHomeClick += ShowHomeScreen;
+            bottomHandler.OnStepBackClick += PerformStepBack;
+            bottomHandler.OnTipsClick += ShowTips;
         }
 
         private void ShowTips()
@@ -45,20 +44,12 @@ namespace UI
 
         }
 
-        private void GoOneStepBack()
+        private void PerformStepBack()
         {
 
         }
 
-        private void SetBg()
-        {
-            string bgName = PlayerPrefs.GetString("BG","bg1");
-            BackgroundItem bgItem = backgrounds.GetBackgroundByName(bgName);
-            bodyIamge.color = bgItem.bodyColor;
-            topBgImage.sprite = bgItem.background;
-        }
-
-        private void Home()
+        private void ShowHomeScreen()
         {
             if (!canClick) return;
             gameManager.canClick = false;
@@ -66,6 +57,14 @@ namespace UI
             rootTween.tween.SetEase(Ease.OutExpo).PlayBackwards();
             mainScreen.Show();
             HideAsync();
+        }
+
+        private void SetBackground()
+        {
+            string bgName = PlayerPrefs.GetString("BG", "bg1");
+            BackgroundItem bgItem = backgrounds.GetBackgroundByName(bgName);
+            bodyIamge.color = bgItem.bodyColor;
+            topBgImage.sprite = bgItem.background;
         }
 
         private async void HideAsync()
@@ -77,7 +76,10 @@ namespace UI
         public async Task InitWordLayouts(string firstWord, string secondWord)
         {
             await CreateWordCell(firstWord, firstWordLayout);
-            await CreateWordCell(secondWord, secondWordLayout);
+            if (!string.IsNullOrEmpty(secondWord))
+            {
+                await CreateWordCell(secondWord, secondWordLayout);
+            }
             levelIsInitialized = true;
         }
 
@@ -87,7 +89,7 @@ namespace UI
             {
                 WordCell wordCell = Instantiate(wordCellPrefab, parent);
                 wordCell.transform.localScale = Vector3.one;
-                wordCell.SetLetter(word[i].ToString(), false); //UnityEngine.Random.value > 0.5f);
+                wordCell.SetLetter(word[i].ToString(), false);
             }
             await Task.Yield();
         }
@@ -109,7 +111,8 @@ namespace UI
             }
             gameManager.canClick = true;
             canClick = true;
-            SetBg();
+            SetBackground();
+            bottomHandler.OnShow();
         }
 
         public override void Hide()

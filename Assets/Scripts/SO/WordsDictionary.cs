@@ -43,6 +43,18 @@ public class WordsDictionary : ScriptableObject
         return wordsArr;
     }
 
+    public string GetWord()
+    {
+        int next = PlayerPrefs.GetInt("NEXT", 0);
+        if (next > words.Count - 1)
+        {
+            PlayerPrefs.SetInt("NEXT", 0);
+            LoadFromJSON(PlayerPrefs.GetInt("DIFFICULTY", 0) == 0 ? Difficulty.MEDIUM : Difficulty.HARD);
+        }
+        PlayerPrefs.SetInt("NEXT", next + 1);
+        return words[next];
+    }
+
     [System.Serializable]
     public class WordsCollection
     {

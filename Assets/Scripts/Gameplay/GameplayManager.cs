@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,11 +14,9 @@ namespace Gameplay
     /// Handles eprubete spawn
     /// Handles letters spawn
     /// </summary>
-    public class GameManager : MonoBehaviour
+    public class GameplayManager : MonoBehaviour
     {
         [SerializeField] private int eprubeteCount;
-
-        [SerializeField] private float[] xPositions;
 
         [SerializeField] private float letterBallSize = 75f;
 
@@ -29,9 +28,9 @@ namespace Gameplay
 
         [SerializeField] private WordsDictionary wordsDictionary;
 
-        [SerializeField] private ClickableEprubete selectedEprubete = null;
+        private ClickableEprubete selectedEprubete = null;
 
-        [SerializeField] private LetterBall selectedLetter = null;
+        private LetterBall selectedLetter = null;
 
         [SerializeField] private bool isMoving = false;
 
@@ -74,7 +73,7 @@ namespace Gameplay
         private async Task CreateEprubeteAsync()
         {
             int height = FirstWord.Length;
-            for (int i = 0; i < xPositions.Length; i++)
+            for (int i = 0; i < eprubeteCount; i++)
             {
                 ClickableEprubete eprubete = Instantiate(eprubetePrefab);
                 eprubeteList.Add(eprubete);
@@ -87,13 +86,10 @@ namespace Gameplay
                 }
                 eprubete.transform.SetParent(parent.transform);
                 eprubete.transform.localScale = Vector3.one;
-                Vector3 pos = Vector3.zero;
-                pos.x = xPositions[i];
-                eprubete.transform.localPosition = pos;
                 eprubete.OnSelect += HandleLetterSelect;
                 eprubete.DispatchMoveComplete += MoveComplete;
             }
-            await Task.Yield(); // Simulate asynchronous work
+            await Task.Yield();
         }
 
         /// <summary>
@@ -117,6 +113,13 @@ namespace Gameplay
             if (verticalString == FirstWord || verticalString == SecondWord || reversedString == FirstWord || reversedString == SecondWord)
             {
                 eprubete.Lock();
+            }
+            else
+            {
+                foreach (ClickableEprubete ep in eprubeteList)
+                {
+                    ep.CheckEprubeteLetters(firstWord);
+                }
             }
             isMoving = false;
         }
@@ -170,9 +173,7 @@ namespace Gameplay
         /// </summary>
         private async Task SpawnBallLettersAsync()
         {
-            string allLetters = FirstWord + SecondWord;
-
-            foreach (char letter in allLetters)
+            foreach (char letter in GetLetters())
             {
                 LetterBall letterBall = Instantiate(letterBallPrefab);
                 letterBall.SetSize(letterBallSize);
@@ -187,7 +188,24 @@ namespace Gameplay
                 eprubete.AddLetterBall(letterBall);
                 letterBall.SetText(letter.ToString());
             }
-            await Task.Yield(); // Simulate asynchronous work
+            foreach(ClickableEprubete eprubete in eprubeteList)
+            {
+                eprubete.CheckEprubeteLetters(firstWord);
+            }
+            await Task.Yield();
+        }
+
+        public List<char> GetLetters()
+        {
+            List<char> lettersList = new List<char>(firstWord + secondWord);
+            string alphabet = "abcdefghijklmnopqrstuvwxyz";
+            List<char> shuffledAlphabet = alphabet.ToCharArray().OrderBy(x => UnityEngine.Random.value).ToList();
+            int randomCount = UnityEngine.Random.Range(2, 4);
+            for (int i = 0; i <= randomCount; i++)
+            {
+                lettersList.Add(shuffledAlphabet[i]);
+            }
+            return lettersList;
         }
     }
 }

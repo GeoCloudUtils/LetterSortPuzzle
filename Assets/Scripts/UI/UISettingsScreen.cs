@@ -8,8 +8,8 @@ using UnityEngine;
 public class UISettingsScreen : UIScreen
 {
     [SerializeField] private LeanWindow leanWindow;
-    [SerializeField] private LeanToggle voiceToggle;
-    [SerializeField] private LeanToggle sfxToggle;
+    [SerializeField] private LeanToggle soundToggle;
+    [SerializeField] private LeanToggle musicToggle;
     [SerializeField] private LeanButton rateUsButton;
     [SerializeField] private LeanButton buyNoAdsButton;
     [SerializeField] private LeanButton buyMeACoffeeButton;
@@ -19,17 +19,10 @@ public class UISettingsScreen : UIScreen
     private void Start()
     {
         // Initialize the toggles based on current settings
-        voiceToggle.On = GetVoiceSetting();
-        sfxToggle.On = GetSFXSetting();
+        soundToggle.On = GetVoiceSetting();
+        musicToggle.On = GetSFXSetting();
 
         closeButton.OnClick.AddListener(Hide);
-
-        // Add listeners to handle toggle changes
-        voiceToggle.OnOn.AddListener(delegate { OnVoiceToggleChanged(true); });
-        voiceToggle.OnOff.AddListener(delegate { OnVoiceToggleChanged(false); });
-
-        sfxToggle.OnOn.AddListener(delegate { OnSFXToggleChanged(true); });
-        sfxToggle.OnOff.AddListener(delegate { OnSFXToggleChanged(false); });
 
         leanWindow.OnOff.AddListener(Hide);
 
@@ -47,6 +40,9 @@ public class UISettingsScreen : UIScreen
     public override void Hide()
     {
         leanWindow.TurnOff();
+        GameDataManager.Instance.gameData.Sound =soundToggle.On;
+         GameDataManager.Instance.gameData.Music = musicToggle.On;
+        GameDataManager.Instance.SaveGame();
         base.Hide();
         // Additional code to run when hiding the settings screen
         Debug.Log("Settings screen hidden");
@@ -56,20 +52,9 @@ public class UISettingsScreen : UIScreen
     {
         base.Show();
         leanWindow.TurnOn();
-        // Additional code to run when showing the settings screen
+        soundToggle.On = GameDataManager.Instance.gameData.Sound;
+        musicToggle.On = GameDataManager.Instance.gameData.Music;
         Debug.Log("Settings screen shown");
-    }
-
-    private void OnVoiceToggleChanged(bool isOn)
-    {
-        SetVoiceSetting(isOn);
-        Debug.Log($"Voice setting changed: {isOn}");
-    }
-
-    private void OnSFXToggleChanged(bool isOn)
-    {
-        SetSFXSetting(isOn);
-        Debug.Log($"SFX setting changed: {isOn}");
     }
 
     private void OnRateUsButtonClicked()
@@ -96,20 +81,6 @@ public class UISettingsScreen : UIScreen
     {
         // Retrieve the SFX setting from PlayerPrefs or another settings storage
         return PlayerPrefs.GetInt("SFXSetting", 1) == 1;
-    }
-
-    private void SetVoiceSetting(bool isOn)
-    {
-        // Save the voice setting to PlayerPrefs or another settings storage
-        PlayerPrefs.SetInt("VoiceSetting", isOn ? 1 : 0);
-        PlayerPrefs.Save();
-    }
-
-    private void SetSFXSetting(bool isOn)
-    {
-        // Save the SFX setting to PlayerPrefs or another settings storage
-        PlayerPrefs.SetInt("SFXSetting", isOn ? 1 : 0);
-        PlayerPrefs.Save();
     }
 
     private void OpenRateUsPage()

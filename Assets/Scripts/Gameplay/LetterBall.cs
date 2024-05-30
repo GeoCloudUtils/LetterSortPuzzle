@@ -10,11 +10,16 @@ namespace Gameplay
     public class LetterBall : MonoBehaviour
     {
         [SerializeField] private TMP_Text letterText;
+
         [SerializeField] private RectTransform rectTransform;
+
+        [SerializeField] private GameObject activeState;
 
         [SerializeField] private ClickableEprubete lastEprupete;
 
         private bool isMoving = false;
+
+        public string Letter { get => letterText.text; }
 
         public bool IsMoving { get => isMoving; private set => isMoving = value; }
 
@@ -34,6 +39,11 @@ namespace Gameplay
         public void SetSize(float size)
         {
             rectTransform.sizeDelta = new Vector2(size, size);
+        }
+
+        public void SetActive(bool active)
+        {
+            activeState.SetActive(active);
         }
 
         /// <summary>

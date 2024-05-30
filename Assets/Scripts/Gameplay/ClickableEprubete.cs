@@ -144,6 +144,23 @@ namespace Gameplay
             return verticalString;
         }
 
+        public void CheckEprubeteLetters(string word)
+        {
+            //int k = 0;
+            //for (int i = 0; i < letterBalls.Count; i++)
+            //{
+            //    LetterBall ball = letterBalls[i];
+            //    ball.SetActive(false);
+            //    if (ball.Letter != word[k].ToString())
+            //    {
+            //        break;
+            //    }
+            //    Debug.Log(ball.Letter +"|"+ word[k]);
+            //    k++;
+            //    ball.SetActive(true);
+            //}
+        }
+
         /// <summary>
         /// Get top cell of eprubete
         /// </summary>

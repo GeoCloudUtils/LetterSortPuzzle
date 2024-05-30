@@ -1,6 +1,8 @@
 using DG.Tweening;
 using Gameplay;
 using Lean.Gui;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UI.Base;
 using UnityEngine;
@@ -10,9 +12,7 @@ namespace UI
 {
     public class UIGameplayScreen : UIScreen
     {
-        [SerializeField] private LeanButton homeButton;
-        [SerializeField] private LeanButton stepBackButton;
-        [SerializeField] private LeanButton tipsButton;
+        [SerializeField] private BottomButtonsHandler bottomHandler;
 
         [SerializeField] private Backgrounds backgrounds;
 
@@ -21,12 +21,14 @@ namespace UI
 
         [SerializeField] private UIMainScreenController mainScreen;
 
-        [SerializeField] private GameManager gameManager;
+        [SerializeField] private GameplayManager gameManager;
 
         [SerializeField] private RectTransform firstWordLayout;
         [SerializeField] private RectTransform secondWordLayout;
 
         [SerializeField] private WordCell wordCellPrefab;
+
+        [SerializeField] private List<WordCell> wordList;
 
         [SerializeField] private DOTweenAnimation rootTween;
 
@@ -35,30 +37,40 @@ namespace UI
 
         private void Start()
         {
-            homeButton.OnClick.AddListener(Home);
-            stepBackButton.OnClick.AddListener(GoOneStepBack);
-            tipsButton.OnClick.AddListener(ShowTips);
+            bottomHandler.OnHomeClick += ShowHomeScreen;
+            bottomHandler.OnHighlightClick += Highlight;
+            bottomHandler.OnTipsClick += ShowTips;
+            bottomHandler.OnAddClick += AddPipe;
+        }
+
+        private void AddPipe()
+        {
+            _ = gameManager.AddPipe();
         }
 
         private void ShowTips()
         {
+            List<WordCell> unshownCells = wordList.FindAll(x => !x.IsShown);
 
+            if (unshownCells.Count > 0)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, unshownCells.Count);
+                WordCell randomUnshownCell = unshownCells[randomIndex];
+                randomUnshownCell.Show();
+            }
+            else
+            {
+                // Handle the case when all cells are already shown
+                Debug.Log("All cells are already shown.");
+            }
         }
 
-        private void GoOneStepBack()
+        private void Highlight()
         {
 
         }
 
-        private void SetBg()
-        {
-            string bgName = PlayerPrefs.GetString("BG","bg1");
-            BackgroundItem bgItem = backgrounds.GetBackgroundByName(bgName);
-            bodyIamge.color = bgItem.bodyColor;
-            topBgImage.sprite = bgItem.background;
-        }
-
-        private void Home()
+        private void ShowHomeScreen()
         {
             if (!canClick) return;
             gameManager.canClick = false;
@@ -66,6 +78,14 @@ namespace UI
             rootTween.tween.SetEase(Ease.OutExpo).PlayBackwards();
             mainScreen.Show();
             HideAsync();
+        }
+
+        private void SetBackground()
+        {
+            string bgName = PlayerPrefs.GetString("BG", "bg1");
+            BackgroundItem bgItem = backgrounds.GetBackgroundByName(bgName);
+            bodyIamge.color = bgItem.bodyColor;
+            topBgImage.sprite = bgItem.background;
         }
 
         private async void HideAsync()
@@ -77,7 +97,10 @@ namespace UI
         public async Task InitWordLayouts(string firstWord, string secondWord)
         {
             await CreateWordCell(firstWord, firstWordLayout);
-            await CreateWordCell(secondWord, secondWordLayout);
+            if (!string.IsNullOrEmpty(secondWord))
+            {
+                await CreateWordCell(secondWord, secondWordLayout);
+            }
             levelIsInitialized = true;
         }
 
@@ -87,7 +110,8 @@ namespace UI
             {
                 WordCell wordCell = Instantiate(wordCellPrefab, parent);
                 wordCell.transform.localScale = Vector3.one;
-                wordCell.SetLetter(word[i].ToString(), false); //UnityEngine.Random.value > 0.5f);
+                wordCell.SetLetter(word[i].ToString());
+                wordList.Add(wordCell);
             }
             await Task.Yield();
         }
@@ -109,7 +133,8 @@ namespace UI
             }
             gameManager.canClick = true;
             canClick = true;
-            SetBg();
+            SetBackground();
+            bottomHandler.OnShow();
         }
 
         public override void Hide()

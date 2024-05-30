@@ -52,6 +52,7 @@ namespace Gameplay
         private void Awake()
         {
             wordsDictionary.LoadFromJSON(Difficulty.EASY);
+            GameDataManager.Instance.LoadGame();
         }
 
         /// <summary>
@@ -66,7 +67,6 @@ namespace Gameplay
             eprubeteList = new List<ClickableEprubete>();
             await CreateEprubeteAsync(eprubeteCount);
             await SpawnBallLettersAsync();
-            await AddPipe();
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace Gameplay
             List<char> lettersList = new List<char>(firstWord + secondWord);
             string alphabet = "abcdefghijklmnopqrstuvwxyz";
             List<char> shuffledAlphabet = alphabet.ToCharArray().OrderBy(x => UnityEngine.Random.value).ToList();
-            int randomCount = UnityEngine.Random.Range(2, 4);
+            int randomCount = UnityEngine.Random.Range(1, 3);
             for (int i = 0; i <= randomCount; i++)
             {
                 lettersList.Add(shuffledAlphabet[i]);

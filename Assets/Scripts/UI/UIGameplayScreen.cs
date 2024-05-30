@@ -2,6 +2,7 @@ using DG.Tweening;
 using Gameplay;
 using Lean.Gui;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UI.Base;
 using UnityEngine;
@@ -27,6 +28,8 @@ namespace UI
 
         [SerializeField] private WordCell wordCellPrefab;
 
+        [SerializeField] private List<WordCell> wordList;
+
         [SerializeField] private DOTweenAnimation rootTween;
 
         private bool levelIsInitialized = false;
@@ -35,16 +38,34 @@ namespace UI
         private void Start()
         {
             bottomHandler.OnHomeClick += ShowHomeScreen;
-            bottomHandler.OnHighlightClick += PerformStepBack;
+            bottomHandler.OnHighlightClick += Highlight;
             bottomHandler.OnTipsClick += ShowTips;
+            bottomHandler.OnAddClick += AddPipe;
+        }
+
+        private void AddPipe()
+        {
+            _ = gameManager.AddPipe();
         }
 
         private void ShowTips()
         {
+            List<WordCell> unshownCells = wordList.FindAll(x => !x.IsShown);
 
+            if (unshownCells.Count > 0)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, unshownCells.Count);
+                WordCell randomUnshownCell = unshownCells[randomIndex];
+                randomUnshownCell.Show();
+            }
+            else
+            {
+                // Handle the case when all cells are already shown
+                Debug.Log("All cells are already shown.");
+            }
         }
 
-        private void PerformStepBack()
+        private void Highlight()
         {
 
         }
@@ -89,7 +110,8 @@ namespace UI
             {
                 WordCell wordCell = Instantiate(wordCellPrefab, parent);
                 wordCell.transform.localScale = Vector3.one;
-                wordCell.SetLetter(word[i].ToString(), false);
+                wordCell.SetLetter(word[i].ToString());
+                wordList.Add(wordCell);
             }
             await Task.Yield();
         }

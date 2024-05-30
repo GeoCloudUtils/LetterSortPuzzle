@@ -46,6 +46,7 @@ public class GameDataManager : MonoBehaviour
 
     public void LoadGame()
     {
+        Debug.Log("Loading data from: " + dataPath);
         if (File.Exists(dataPath))
         {
             string jsonData = File.ReadAllText(dataPath);
@@ -101,11 +102,14 @@ public class GameData
     public bool Music;
     public bool Sound;
     public bool NoAds;
+
     public int Level;
     public int TipsCount;
-    public int HighlightsCount;
-    public string BackgroundName;
     public int Coins;
+    public int Highlights;
+    public int Removes;
+
+    public string BackgroundName;
 
     public List<string> Eprubete;
     public List<string> Backgrounds;
@@ -116,11 +120,11 @@ public class GameData
         Sound = true;
         NoAds = false;
         Level = 1;
-        TipsCount = 0;
-        HighlightsCount = 0;
-        BackgroundName = "Default";
-        Coins = 0;
-
+        TipsCount = 8;
+        Highlights = 1;
+        Removes = 1;
+        BackgroundName = "bg1";
+        Coins = 1;
         Eprubete = new List<string>();
         Backgrounds = new List<string>();
     }

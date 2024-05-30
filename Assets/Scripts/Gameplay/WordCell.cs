@@ -7,13 +7,16 @@ public class WordCell : MonoBehaviour
 {
     [SerializeField] private TMP_Text letterText;
 
-    public void SetLetter(string letter, bool isHidden = true)
+    public bool IsShown { get; private set; } = false;
+    public void SetLetter(string letter)
     {
-        letterText.SetText(isHidden ? "?" : letter);
+        letterText.SetText(letter);
+        letterText.gameObject.SetActive(false);
     }
 
-    public void Activate()
+    public void Show()
     {
-        letterText.enabled = true;
+        letterText.gameObject.SetActive(true);
+        IsShown = true;
     }
 }

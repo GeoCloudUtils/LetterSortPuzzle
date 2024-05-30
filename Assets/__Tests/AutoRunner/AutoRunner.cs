@@ -5,7 +5,6 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static MoveCalculator;
 using Random = UnityEngine.Random;
 
 public class AutoRunner : MonoBehaviour
@@ -17,14 +16,15 @@ public class AutoRunner : MonoBehaviour
     [SerializeField] private TMP_Text _seedText;
     [SerializeField] private float _speed;
     [SerializeField] private string _word;
+    [SerializeField] private int _pipes;
     [SerializeField] private AutoRunnerLetter _slotPrefab;
     [SerializeField] private List<RectTransform> _tubes;
+    [SerializeField] private MovesCalculator _moveCalculator;
     private List<AutoRunnerLetter> _spawnedLetters = new List<AutoRunnerLetter>();
     private bool _running = false;
     private System.Random _rand = new System.Random();
     private int _seed = -1;
     private float _timeSinceLastMove = 1f;
-    private MoveCalculator _moveCalculator = new MoveCalculator();
     private List<MoveAction> _moves;
     private int _currMoveIndex;
     private bool _autoRun = false;
@@ -69,8 +69,8 @@ public class AutoRunner : MonoBehaviour
             Random.InitState(_seed);
             _seedText.text = $"Seed:{_seed}";
         }
-        _moves = _moveCalculator.Run(_word);
 
+        // Remove slots.
         foreach(var pair in _slots)
         {
             foreach(var elem in pair.Value)
@@ -79,10 +79,15 @@ public class AutoRunner : MonoBehaviour
             }
         }
 
+        List<Stack<char>> pipes = _moveCalculator.Generate(_word, _pipes);
+
         _slots = new Dictionary<int, Stack<AutoRunnerLetter>>();
-        CreateSlots(_moveCalculator.Towers[0], _tubes[0], 0);
-        CreateSlots(_moveCalculator.Towers[1], _tubes[1], 1);
-        CreateSlots(_moveCalculator.Towers[2], _tubes[2], 2);
+        for (int a = 0; a < pipes.Count; a++)
+        {
+            CreateSlots(pipes[a], _tubes[a], a);
+        }
+
+        _moves = _moveCalculator.CalculateMoves();
 
         _currMoveIndex = -1;
     }
@@ -90,7 +95,9 @@ public class AutoRunner : MonoBehaviour
     private void CreateSlots(Stack<char> tower, RectTransform parent, int index)
     {
         Stack<AutoRunnerLetter> slots = new Stack<AutoRunnerLetter>();
-        foreach(var elem in tower.ToList())
+        var list = tower.ToList();
+        list.Reverse();
+        foreach (var elem in list)
         {
             AutoRunnerLetter slot = Instantiate(_slotPrefab, parent);
             slot.SetLetter(elem.ToString());

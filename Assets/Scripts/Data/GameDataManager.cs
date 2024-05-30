@@ -103,7 +103,7 @@ public class GameData
     public bool NoAds;
     public int Level;
     public int TipsCount;
-    public int StepBackPoints;
+    public int HighlightsCount;
     public string BackgroundName;
     public int Coins;
 
@@ -117,7 +117,7 @@ public class GameData
         NoAds = false;
         Level = 1;
         TipsCount = 0;
-        StepBackPoints = 0;
+        HighlightsCount = 0;
         BackgroundName = "Default";
         Coins = 0;
 

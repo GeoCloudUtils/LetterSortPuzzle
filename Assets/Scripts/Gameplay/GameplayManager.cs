@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Gameplay
 {
@@ -63,17 +64,18 @@ namespace Gameplay
             FirstWord = words[0];
             SecondWord = words[1];
             eprubeteList = new List<ClickableEprubete>();
-            await CreateEprubeteAsync();
+            await CreateEprubeteAsync(eprubeteCount);
             await SpawnBallLettersAsync();
+            await AddPipe();
         }
 
         /// <summary>
         /// Create eprubete at runtime
         /// </summary>
-        private async Task CreateEprubeteAsync()
+        private async Task CreateEprubeteAsync(int count)
         {
-            int height = FirstWord.Length;
-            for (int i = 0; i < eprubeteCount; i++)
+            int height = FirstWord.Length + 1;
+            for (int i = 0; i < count; i++)
             {
                 ClickableEprubete eprubete = Instantiate(eprubetePrefab);
                 eprubeteList.Add(eprubete);
@@ -89,6 +91,7 @@ namespace Gameplay
                 eprubete.OnSelect += HandleLetterSelect;
                 eprubete.DispatchMoveComplete += MoveComplete;
             }
+            LayoutRebuilder.ForceRebuildLayoutImmediate(parent);
             await Task.Yield();
         }
 
@@ -168,6 +171,11 @@ namespace Gameplay
             }
         }
 
+        public async Task AddPipe()
+        {
+            await CreateEprubeteAsync(1);
+        }
+
         /// <summary>
         /// Spawn letters
         /// </summary>
@@ -188,7 +196,7 @@ namespace Gameplay
                 eprubete.AddLetterBall(letterBall);
                 letterBall.SetText(letter.ToString());
             }
-            foreach(ClickableEprubete eprubete in eprubeteList)
+            foreach (ClickableEprubete eprubete in eprubeteList)
             {
                 eprubete.CheckEprubeteLetters(firstWord);
             }

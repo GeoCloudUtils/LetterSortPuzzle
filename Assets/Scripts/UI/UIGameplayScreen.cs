@@ -35,7 +35,7 @@ namespace UI
         private void Start()
         {
             bottomHandler.OnHomeClick += ShowHomeScreen;
-            bottomHandler.OnStepBackClick += PerformStepBack;
+            bottomHandler.OnHighlightClick += PerformStepBack;
             bottomHandler.OnTipsClick += ShowTips;
         }
 

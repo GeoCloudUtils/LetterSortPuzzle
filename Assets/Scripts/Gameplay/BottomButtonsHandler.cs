@@ -1,58 +1,54 @@
 using Lean.Gui;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 public class BottomButtonsHandler : MonoBehaviour
 {
     [SerializeField] private LeanButton homeButton;
-    [SerializeField] private LeanButton stepBackButton;
+    [SerializeField] private LeanButton removeLetterButton;
     [SerializeField] private LeanButton tipsButton;
+    [SerializeField] private LeanButton highlightButton;
+    [SerializeField] private LeanButton addPipeButton;
 
     [SerializeField] private TMP_Text stepBackCountText;
     [SerializeField] private TMP_Text tipsCountText;
 
     public event Action OnTipsClick;
-    public event Action OnStepBackClick;
+    public event Action OnHighlightClick;
     public event Action OnHomeClick;
+    public event Action OnRemoveClick;
+    public event Action OnAddClick;
 
     private void Start()
     {
-        if (homeButton == null || stepBackButton == null || tipsButton == null)
+        if (homeButton == null || removeLetterButton == null || tipsButton == null)
         {
             Debug.LogError("One or more buttons are not assigned in the Inspector.");
             return;
         }
 
-        homeButton.OnClick.AddListener(OnHomeButtonClick);
-        stepBackButton.OnClick.AddListener(OnStepBackButtonClick);
-        tipsButton.OnClick.AddListener(OnTipsButtonClick);
+        homeButton.OnClick.AddListener(GoToHomeScreen);
+        removeLetterButton.OnClick.AddListener(RemoveLetter);
+        tipsButton.OnClick.AddListener(ShowTips);
+        highlightButton.OnClick.AddListener(Highlight);
+        addPipeButton.OnClick.AddListener(AddPipe);
+    }
+
+    private void AddPipe()
+    {
+        OnAddClick?.Invoke();
     }
 
     public void OnShow()
     {
         tipsCountText.SetText(GameDataManager.Instance.gameData.TipsCount.ToString());
-        stepBackCountText.SetText(GameDataManager.Instance.gameData.StepBackPoints.ToString());
+        stepBackCountText.SetText(GameDataManager.Instance.gameData.HighlightsCount.ToString());
     }
 
-    private void OnHomeButtonClick()
+    private void RemoveLetter()
     {
-        Debug.Log("Home button clicked");
-        GoToHomeScreen();
-    }
-
-    private void OnStepBackButtonClick()
-    {
-        Debug.Log("Step Back button clicked");
-        StepBack();
-    }
-
-    private void OnTipsButtonClick()
-    {
-        Debug.Log("Tips button clicked");
-        ShowTips();
+        OnRemoveClick?.Invoke();
     }
 
     private void GoToHomeScreen()
@@ -60,33 +56,38 @@ public class BottomButtonsHandler : MonoBehaviour
         Debug.Log("Navigating to home screen");
     }
 
-    private void StepBack()
+    private void ExecuteAction(Func<int> getCount, Action setCount, Action onActionClick, string actionName)
     {
-        if (GameDataManager.Instance.gameData.StepBackPoints > 0)
+        if (getCount() > 0)
         {
-            GameDataManager.Instance.gameData.StepBackPoints--;
+            setCount();
             GameDataManager.Instance.SaveGame();
-            OnStepBackClick?.Invoke();
-            Debug.Log("Performed a step back. Remaining step back points: " + GameDataManager.Instance.gameData.StepBackPoints);
+            onActionClick?.Invoke();
+            Debug.Log($"Performed {actionName}. Remaining {actionName.ToLower()} count: {getCount()}");
         }
         else
         {
-            Debug.Log("No step back points available.");
+            Debug.Log($"No {actionName.ToLower()} available.");
         }
+    }
+
+    private void Highlight()
+    {
+        ExecuteAction(
+            () => GameDataManager.Instance.gameData.HighlightsCount,
+            () => GameDataManager.Instance.gameData.HighlightsCount--,
+            OnHighlightClick,
+            "Highlight"
+        );
     }
 
     private void ShowTips()
     {
-        if (GameDataManager.Instance.gameData.TipsCount > 0)
-        {
-            GameDataManager.Instance.gameData.TipsCount--;
-            GameDataManager.Instance.SaveGame();
-            OnTipsClick?.Invoke();
-            Debug.Log("Showing a tip. Remaining tips count: " + GameDataManager.Instance.gameData.TipsCount);
-        }
-        else
-        {
-            Debug.Log("No tips available.");
-        }
+        ExecuteAction(
+            () => GameDataManager.Instance.gameData.TipsCount,
+            () => GameDataManager.Instance.gameData.TipsCount--,
+            OnTipsClick,
+            "Tips"
+        );
     }
 }

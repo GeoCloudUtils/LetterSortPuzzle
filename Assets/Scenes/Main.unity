@@ -227,37 +227,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1095a6af06fc1d48971b608228639f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &713335451 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3871104222041542693, guid: e20e40ee699c01f45ade3984f98cd158, type: 3}
-  m_PrefabInstance: {fileID: 3871104222338081626}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &713335453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 713335451}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 4
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
 --- !u!1 &1399538461
 GameObject:
   m_ObjectHideFlags: 0
@@ -543,7 +512,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ef0c2466435f0f4ab8de927a5ffa412, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eprubeteCount: 4
+  eprubeteCount: 3
   letterBallSize: 65
   parent: {fileID: 397734784}
   eprubetePrefab: {fileID: 8328859949268310099, guid: 6e15959dcf7c22a4ab542d50434dc891, type: 3}

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.XR;
 using Random = UnityEngine.Random;
 
 public class MoveAction
@@ -24,98 +26,191 @@ public class MovesCalculator : MonoBehaviour
 {
     [SerializeField] private bool _run = false;
     [SerializeField] private string _word;
+    [SerializeField] private string _word2;
     [SerializeField] private int _pipesCount = 4;
+    [SerializeField] private int _seed = 4324324;
+    [SerializeField] private bool _autoSeed = true;
+    [SerializeField] private string _randomLetters;
+    private int _maxSlotsUsed = 0;
     private List<Stack<char>> Pipes;
     private int _target;
     private List<MoveAction> _moves;
+    private int _frozenPipe = -1;
+    private string _currWord;
+    private bool _failed;
+
+    private int MaxPipeCapacity => _word.Length + 
+        (string.IsNullOrEmpty(_randomLetters)?0:_randomLetters.Length);
+
+    public bool Failed => _failed;
+
 
     private void OnValidate()
     {
         if (_run)
         {
             _run = false;
-            Generate(_word, _pipesCount);
-            CalculateMoves();
+            _frozenPipe = -1;
+            _maxSlotsUsed = 0;
+
+
+            if (_autoSeed)
+            {
+                System.Random rand = new System.Random();
+                _seed = rand.Next(int.MaxValue);
+            }
+
+            Generate(_word+_word2, _randomLetters, _pipesCount, _seed);
+
+            CalculateMoves(_word, _word2);
         }
     }
 
     /// <summary>
     /// Generate the pipes.
     /// </summary>
-    public List<Stack<char>> Generate(string word, int pipesCount)
+    public List<Stack<char>> Generate(string word, string randomLetters, int pipesCount, int seed)
     {
-        // Set.
-        if (pipesCount < 3)
+        try
         {
-            throw new Exception("Please set pipesCount >= 3!");
-        }
-        _pipesCount = pipesCount;
-        _word = word;
+            Random.InitState(seed);
+            _seed = seed;
 
-        // Add Letters to Pipes.
-        Pipes = new List<Stack<char>>();
-        for (int a = 0; a < _pipesCount; a++)
-        {
-            Pipes.Add(new Stack<char>());
-        }
-        for (int i = 0; i < _word.Length; i++)
-        {
-            Pipes[Random.Range(0, Pipes.Count)].Push(_word[i]);
-        }
-
-        // Find best target.
-        int bestTarget = 0;
-        int bestCorrectLetters = 0;
-        bool bestTargetFound = false;
-        string revWord = ReverseString(_word);
-        //Debug.Log($"Word:{_word}; RevWord:{revWord};");
-        for (int a = 0; a < _pipesCount; a++)
-        {
-            var list = Pipes[a].ToList();
-            int correctLetters = 0;
-            //Debug.Log($"Pipe {a}. Pipe:{string.Join(",", list)}");
-            for (int b =0; b < list.Count; ++b)
+            // Set.
+            if (pipesCount < 3)
             {
-                //Debug.Log($"PipeElem {b}. Elem:{list[b]}; WordElem:{_word[b]}; RevWordElem:{revWord[b]};");
-                if (list[b] == revWord[b])
+                throw new Exception("Please set pipesCount >= 3!");
+            }
+            _randomLetters = randomLetters;
+            _seed = seed;
+            _pipesCount = pipesCount;
+            _currWord = word;
+            _maxSlotsUsed = 0;
+            _frozenPipe = -1;
+            _failed = false;
+
+            // Add Letters to Pipes.
+            Pipes = new List<Stack<char>>();
+            for (int a = 0; a < _pipesCount; a++)
+            {
+                Pipes.Add(new Stack<char>());
+            }
+            for (int i = 0; i < _currWord.Length; i++)
+            {
+                Pipes[Random.Range(0, Pipes.Count)].Push(_currWord[i]);
+            }
+
+            // Add random letters.
+            if (!string.IsNullOrEmpty(_randomLetters))
+            {
+                for (int i = 0; i < _randomLetters.Length; i++)
                 {
-                    ++correctLetters;
+                    Pipes[Random.Range(0, Pipes.Count)].Push(_randomLetters[i]);
                 }
-                else
-                    break;
             }
-            if(correctLetters > 0 && bestCorrectLetters < correctLetters)
+
+            // Find best target.
+            int bestTarget = 0;
+            int bestCorrectLetters = 0;
+            bool bestTargetFound = false;
+            string revWord = ReverseString(_currWord);
+            //Debug.Log($"Word:{_word}; RevWord:{revWord};");
+            for (int a = 0; a < _pipesCount; a++)
             {
-                bestCorrectLetters = correctLetters;
-                bestTarget = a;
-                bestTargetFound = true;
+                var list = Pipes[a].ToList();
+                int correctLetters = 0;
+                //Debug.Log($"Pipe {a}. Pipe:{string.Join(",", list)}");
+                for (int b = 0; b < list.Count; ++b)
+                {
+                    //Debug.Log($"PipeElem {b}. Elem:{list[b]}; WordElem:{_word[b]}; RevWordElem:{revWord[b]};");
+                    if (list[b] == revWord[b])
+                    {
+                        ++correctLetters;
+                    }
+                    else
+                        break;
+                }
+                if (correctLetters > 0 && bestCorrectLetters < correctLetters)
+                {
+                    bestCorrectLetters = correctLetters;
+                    bestTarget = a;
+                    bestTargetFound = true;
+                }
             }
+
+            // If best target not found, choose random.
+            if (bestTargetFound)
+                _target = bestTarget;
+            else
+                _target = Random.Range(0, _pipesCount);
+
+            //Debug.Log($"Target:{_target}; BestTarget:{bestTarget}; BestLetters:{bestCorrectLetters}; BestTargetFound:{bestTargetFound};");
+
+            //Debug.Log($"Initial State of Pipes: {PrintPipes()}");
+
+            return Pipes;
         }
+        catch (Exception e)
+        {
+            CheckFailed(e.Message);
+            return null;
+        }
+    }
 
-        // If best target not found, choose random.
-        if (bestTargetFound)
-            _target = bestTarget;
-        else
-            _target = Random.Range(0, _pipesCount);
-        
-        //Debug.Log($"Target:{_target}; BestTarget:{bestTarget}; BestLetters:{bestCorrectLetters}; BestTargetFound:{bestTargetFound};");
+    public List<MoveAction> CalculateMoves(string word1, string word2)
+    {
+        try
+        {
+            Debug.Log($"---- CalculateMoves Started. Word1:{word1}; Word2:{word2}; ----");
+            
+            // Set.
+            _word = word1;
+            _word2 = word2;
+            _moves = new List<MoveAction>();
 
-        Debug.Log($"Initial State of Pipes: {PrintPipes()}");
+            // Run Word 1.
+            _currWord = _word;
+            Run();
 
-        return Pipes;
+            //Debug.Log("--------------------------------");
+            //Debug.Log("--------------------------------");
+
+            // Freeze pipe with Word 1.
+            _currWord = _word2;
+            _frozenPipe = _target;
+            do
+            {
+                _target = Random.Range(0, _pipesCount);
+            }
+            while (_frozenPipe == _target);
+
+            // Run Word 2.
+            Run();
+
+            Debug.Log($"---- CalculateMoves Finished. TotalMoves:{_moves.Count}; Failed:{_failed}; Seed:{_seed}; Pipes:{PrintPipes()} ----");
+
+            return _moves;
+
+        }
+        catch (Exception e)
+        {
+            CheckFailed(e.Message);
+            return null;
+        }
     }
 
     /// <summary>
     /// Calculate moves to solve the puzzle.
     /// </summary>
-    public List<MoveAction> CalculateMoves()
+    private List<MoveAction> Run()
     {
+        //Debug.Log("---- Run Start ----");
+
         if (Pipes == null)
         {
-            throw new Exception("Use Generate() first!");
+            CheckFailed("Use Generate() first!");
+            return null;
         }
-
-        _moves = new List<MoveAction>();
 
         // Phase 1: Move all letters from Target to other pipes.
         RunPhaseOne();
@@ -126,8 +221,10 @@ public class MovesCalculator : MonoBehaviour
         //Debug.Log($"Final State of Pipes(moves={result.Count}): {PrintPipes()}");
 
         // Clear.
-        Pipes = null;
-        _target = -1;
+        // Pipes = null;
+        // _target = -1;
+
+        Debug.Log($"---- Run Finished. Moves:{_moves.Count}; Failed:{_failed}; Seed:{_seed}; Pipes:{PrintPipes()} ----");
 
         return _moves;
     }
@@ -138,21 +235,24 @@ public class MovesCalculator : MonoBehaviour
     private void RunPhaseTwo()
     {
         int iterations = 200;
-        int searchLetterIdx = _word.Length - 1;
+        int searchLetterIdx = _currWord.Length - 1;
         while (searchLetterIdx >= 0 && iterations-- > 0)
         {
             for (int source = 0; source < _pipesCount; source++)
             {
-                if (source == _target)
+                if (source == _target || source == _frozenPipe)
                     continue;
 
                 List<int> aux = new List<int>();
                 for (int a = 0; a < _pipesCount; a++)
                 {
-                    if (a != _target && a != source)
+                    if (a != _target && a != source && a != _frozenPipe)
                         aux.Add(a);
                 }
                 searchLetterIdx = Process(source, _target, aux, searchLetterIdx);
+
+                if (searchLetterIdx < 0)
+                    break;
             }
         }
         if (iterations <= 0)
@@ -169,7 +269,7 @@ public class MovesCalculator : MonoBehaviour
         List<int> aux = new List<int>();
         for (int a = 0; a < _pipesCount; a++)
         {
-            if (a != _target)
+            if (a != _target && a != _frozenPipe)
                 aux.Add(a);
         }
         //Debug.Log($"Target:{_target}; Aux:{string.Join(",", aux.ToArray())}");
@@ -193,14 +293,17 @@ public class MovesCalculator : MonoBehaviour
         {
             int src = _target;
             int dst = aux[Random.Range(0, aux.Count)];
-            Move(src, dst);
+            if (Pipes[_target].Count < MaxPipeCapacity)
+                Move(src, dst, 1);
+            else
+                CheckFailed($"Destination {dst} capacity exceeded.");
         }
 
         if (iterations <= 0)
         {
             throw new Exception($"Max iterations occurred in Phase 1(TargetPipeClean).");
         }
-        Debug.Log($"Medium State of Pipes: {PrintPipes()}; CountToSkip:{countToSkip};");
+        //Debug.Log($"Medium State of Pipes: {PrintPipes()}; CountToSkip:{countToSkip};");
     }
 
     /// <summary>
@@ -213,20 +316,31 @@ public class MovesCalculator : MonoBehaviour
     /// <returns>The new letter index. If progressed, a new index will be. If not, the same.</returns>
     private int Process(int source, int target, List<int> aux, int searchLetterIdx)
     {
-        //Debug.Log($"Process. Source:{source}; Target:{_target}; Aux:{string.Join(",", aux.ToArray())}; Pipes:{PrintPipes()}");
+        //Debug.Log($"Process. Source:{source}; Target:{_target}; LetterIdx:{searchLetterIdx}; Word:{_currWord}; Aux:{string.Join(",", aux.ToArray())}; Pipes:{PrintPipes()}");
         foreach (char letter in Pipes[source].ToArray())
         {
             char elem = Pipes[source].Peek();
-            if (elem == _word[searchLetterIdx])
+            if (elem == _currWord[searchLetterIdx])
             {
                 --searchLetterIdx;
                 Move(source, target);
             }
             else
             {
-                int auxIdx = aux[aux.Count == 1 ? 0 : Random.Range(0, aux.Count)];
+                int iterations = 50;
+                int auxIdx = 0;
+                do
+                {
+                    auxIdx = aux[aux.Count == 1 ? 0 : Random.Range(0, aux.Count)];
+                    if (Pipes[auxIdx].Count < MaxPipeCapacity)
+                        break;
+                }
+                while (iterations-- > 0);
                 Move(source, auxIdx);
             }
+
+            if (searchLetterIdx < 0)
+                break;
         }
         return searchLetterIdx;
     }
@@ -234,12 +348,22 @@ public class MovesCalculator : MonoBehaviour
     /// <summary>
     /// Move a letter from a Source to Destination.
     /// </summary>
-    private void Move(int src, int dst)
+    private void Move(int src, int dst, int phase=2)
     {
         char elem = Pipes[src].Pop();
         Pipes[dst].Push(elem);
-        _moves.Add(new MoveAction(src, dst, _word.IndexOf(elem)));
-        Debug.Log($"Moved '{elem}' from {src} to {dst}; Pipes:{PrintPipes()}");
+        _moves.Add(new MoveAction(src, dst, _currWord.IndexOf(elem)));
+        //Debug.Log($"[Phase {phase}] Moved '{elem}' from {src} to {dst}; Moves:{_moves.Count}; Pipes:{PrintPipes()}");
+
+        if (Pipes[dst].Count > MaxPipeCapacity)
+        {
+            CheckFailed($"Pipe {dst} capacity exceeded.");
+        }
+
+        if (Pipes[dst].Count > _maxSlotsUsed)
+        {
+            _maxSlotsUsed = Pipes[dst].Count;
+        }
     }
 
     private string PrintPipes()
@@ -250,6 +374,10 @@ public class MovesCalculator : MonoBehaviour
         {
             result += $"Pipe {idx}: {string.Join(",", elem.ToArray())}, ";
             ++idx;
+            //if(elem.Count > MaxPipeCapacity)
+            //{
+            //    Debug.LogError($"Pipe {idx-1} capacity exceeded.");
+            //}
         }
         result = result.Remove(result.Length - 2);
         result += "]";
@@ -263,6 +391,12 @@ public class MovesCalculator : MonoBehaviour
         for (int i = charArray.Length - 1; i > -1; i--)
             reversedString += charArray[i];
         return reversedString;
+    }
+
+    private void CheckFailed(string msg)
+    {
+        Debug.LogError(msg);
+        _failed = true;
     }
 }
 

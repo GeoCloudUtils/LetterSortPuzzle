@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 206877971}
+  - component: {fileID: 206877973}
   - component: {fileID: 2005700109141328971}
   m_Layer: 5
   m_Name: grid

@@ -3,6 +3,8 @@ using Gameplay;
 using Lean.Gui;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using UI.Base;
 using UnityEngine;
@@ -15,6 +17,8 @@ namespace UI
         [SerializeField] private BottomButtonsHandler bottomHandler;
 
         [SerializeField] private Backgrounds backgrounds;
+
+        [SerializeField] private WinPanel winPanel;
 
         [SerializeField] private Image topBgImage;
         [SerializeField] private Image bodyIamge;
@@ -35,12 +39,19 @@ namespace UI
         private bool levelIsInitialized = false;
         private bool canClick = true;
 
+        public event Action MoveNext;
         private void Start()
         {
             bottomHandler.OnHomeClick += ShowHomeScreen;
             bottomHandler.OnHighlightClick += Highlight;
             bottomHandler.OnTipsClick += ShowTips;
             bottomHandler.OnAddClick += AddPipe;
+            winPanel.OnMoveNext += HandleMoveNext;
+        }
+
+        private void HandleMoveNext()
+        {
+            MoveNext?.Invoke();
         }
 
         private void AddPipe()
@@ -94,6 +105,18 @@ namespace UI
             Hide();
         }
 
+        public void ShowWinScreen()
+        {
+            bottomHandler.gameObject.SetActive(false);
+            winPanel.gameObject.SetActive(true);
+
+            string tips = UnityEngine.Random.Range(1, 3).ToString();
+            string removes = UnityEngine.Random.Range(1, 3).ToString();
+            string highlights = UnityEngine.Random.Range(1, 3).ToString();
+
+            winPanel.OnShow(tips, removes, highlights);
+        }
+
         public async Task InitWordLayouts(string firstWord, string secondWord)
         {
             await CreateWordCell(firstWord, firstWordLayout);
@@ -104,6 +127,33 @@ namespace UI
             levelIsInitialized = true;
         }
 
+        public void ShowWord(string word)
+        {
+            int halfCount = wordList.Count / 2;
+            var layoutWord = new StringBuilder(halfCount);
+
+            for (int i = 0; i < halfCount; i++)
+            {
+                layoutWord.Append(wordList[i].GetCellLetter());
+            }
+
+            IEnumerable<WordCell> cellsToShow;
+
+            if (word == layoutWord.ToString())
+            {
+                cellsToShow = wordList.Take(halfCount);
+            }
+            else
+            {
+                cellsToShow = wordList.Skip(halfCount);
+            }
+
+            foreach (var cell in cellsToShow)
+            {
+                cell.Show();
+            }
+        }
+
         private async Task CreateWordCell(string word, RectTransform parent)
         {
             for (int i = 0; i < word.Length; i++)
@@ -111,6 +161,7 @@ namespace UI
                 WordCell wordCell = Instantiate(wordCellPrefab, parent);
                 wordCell.transform.localScale = Vector3.one;
                 wordCell.SetLetter(word[i].ToString());
+                wordCell.Show();//debug
                 wordList.Add(wordCell);
             }
             await Task.Yield();

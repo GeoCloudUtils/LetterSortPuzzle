@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,7 +22,11 @@ namespace Gameplay
 
         [SerializeField] private float letterBallSize = 75f;
 
+        [SerializeField] private GameObject starsFX;
+
         [SerializeField] private RectTransform parent;
+
+        [SerializeField] private UIGameplayScreen gameplayScreen;
 
         [SerializeField] private ClickableEprubete eprubetePrefab;
 
@@ -53,6 +58,7 @@ namespace Gameplay
         {
             wordsDictionary.LoadFromJSON(Difficulty.EASY);
             GameDataManager.Instance.LoadGame();
+            gameplayScreen.MoveNext += MoveNext;
         }
 
         /// <summary>
@@ -74,7 +80,7 @@ namespace Gameplay
         /// </summary>
         private async Task CreateEprubeteAsync(int count)
         {
-            int height = FirstWord.Length + 1;
+            int height = FirstWord.Length;
             for (int i = 0; i < count; i++)
             {
                 ClickableEprubete eprubete = Instantiate(eprubetePrefab);
@@ -101,21 +107,23 @@ namespace Gameplay
         /// <param name="eprubete"></param>
         private void MoveComplete(ClickableEprubete eprubete)
         {
-            if (IsComplete())
-            {
-                if (PlayerPrefs.GetInt("LEVEL_UP", 0) == 0)
-                {
-                    PlayerPrefs.SetInt("LEVEL_UP", 1);
-                }
-                SceneManager.LoadScene("Main");
-                return;
-            }
             string verticalString = eprubete.GetVerticalString();
             string reversedString = new string(verticalString.Reverse().ToArray());
+            if (IsComplete())
+            {
+                Vector3 pos = new Vector3(eprubete.transform.position.x, eprubete.transform.position.y - 2f);
+                Instantiate(starsFX, pos, starsFX.transform.rotation);
+                gameplayScreen.ShowWord(verticalString);
+                gameplayScreen.ShowWinScreen();
+                return;
+            }
 
             if (verticalString == FirstWord || verticalString == SecondWord || reversedString == FirstWord || reversedString == SecondWord)
             {
                 eprubete.Lock();
+                Vector3 pos = new Vector3(eprubete.transform.position.x, eprubete.transform.position.y - 2f);
+                Instantiate(starsFX, pos, starsFX.transform.rotation);
+                gameplayScreen.ShowWord(verticalString);
             }
             else
             {
@@ -127,6 +135,14 @@ namespace Gameplay
             isMoving = false;
         }
 
+        private void MoveNext()
+        {
+            if (PlayerPrefs.GetInt("LEVEL_UP", 0) == 0)
+            {
+                PlayerPrefs.SetInt("LEVEL_UP", 1);
+            }
+            SceneManager.LoadScene("Main");
+        }
 
         /// <summary>
         /// Check for level complete
@@ -205,6 +221,8 @@ namespace Gameplay
 
         public List<char> GetLetters()
         {
+            Debug.Log("First word :" + firstWord.ToString());
+            Debug.Log("Second word: " + secondWord.ToString());
             List<char> lettersList = new List<char>(firstWord + secondWord);
             string alphabet = "abcdefghijklmnopqrstuvwxyz";
             List<char> shuffledAlphabet = alphabet.ToCharArray().OrderBy(x => UnityEngine.Random.value).ToList();

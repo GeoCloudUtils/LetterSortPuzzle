@@ -8,6 +8,12 @@ public class WordCell : MonoBehaviour
     [SerializeField] private TMP_Text letterText;
 
     public bool IsShown { get; private set; } = false;
+
+    public string GetCellLetter()
+    {
+        return letterText.text;
+    }
+
     public void SetLetter(string letter)
     {
         letterText.SetText(letter);

@@ -107,7 +107,7 @@ public class GameData
     public int TipsCount;
     public int Coins;
     public int Highlights;
-    public int Removes;
+    public int WordsOpen;
 
     public string BackgroundName;
 
@@ -122,7 +122,7 @@ public class GameData
         Level = 1;
         TipsCount = 8;
         Highlights = 1;
-        Removes = 1;
+        WordsOpen = 1;
         BackgroundName = "bg1";
         Coins = 1;
         Eprubete = new List<string>();

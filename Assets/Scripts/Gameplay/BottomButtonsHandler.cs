@@ -44,14 +44,14 @@ public class BottomButtonsHandler : MonoBehaviour
 
     private void AddPipe()
     {
-        addPipeButton.gameObject.SetActive(addedPipes < 1);
         OnAddClick?.Invoke();
         addedPipes++;
+        addPipeButton.gameObject.SetActive(false);
     }
 
     public void OnShow()
     {
-        SetState(removeLetterButton, () => GameDataManager.Instance.gameData.Removes);
+        SetState(removeLetterButton, () => GameDataManager.Instance.gameData.WordsOpen);
         SetState(tipsButton, () => GameDataManager.Instance.gameData.TipsCount);
         SetState(highlightButton, () => GameDataManager.Instance.gameData.Highlights);
     }

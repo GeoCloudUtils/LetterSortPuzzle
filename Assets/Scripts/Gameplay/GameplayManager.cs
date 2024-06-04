@@ -209,10 +209,22 @@ namespace Gameplay
             string alphabet = "abcdefghijklmnopqrstuvwxyz";
             List<char> shuffledAlphabet = alphabet.ToCharArray().OrderBy(x => UnityEngine.Random.value).ToList();
             int randomCount = UnityEngine.Random.Range(1, 3);
-            for (int i = 0; i <= randomCount; i++)
+
+            HashSet<char> existingLetters = new HashSet<char>(lettersList);
+
+            int addedCount = 0;
+            for (int i = 0; i < shuffledAlphabet.Count && addedCount < randomCount; i++)
             {
-                lettersList.Add(shuffledAlphabet[i]);
+                char letter = shuffledAlphabet[i];
+                if (!existingLetters.Contains(letter))
+                {
+                    Debug.Log("Added additional letter: " + letter);
+                    lettersList.Add(letter);
+                    existingLetters.Add(letter);
+                    addedCount++;
+                }
             }
+
             return lettersList;
         }
     }

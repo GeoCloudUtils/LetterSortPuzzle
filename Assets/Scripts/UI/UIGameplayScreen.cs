@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UI.Base;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,10 @@ namespace UI
 {
     public class UIGameplayScreen : UIScreen
     {
+        [SerializeField] private TMP_Text debugText;
+
+        [SerializeField] private AdMobController adMobController;
+
         [SerializeField] private BottomButtonsHandler bottomHandler;
 
         [SerializeField] private Backgrounds backgrounds;
@@ -56,7 +61,21 @@ namespace UI
 
         private void AddPipe()
         {
-            _ = gameManager.AddPipe();
+            adMobController.ShowAd(AdType.Rewarded, OnRewardedAddFinished);
+        }
+
+        private void OnRewardedAddFinished(bool success, string id)
+        {
+            if (success)
+            {
+                Debug.Log("Rewarded ad success!");
+                _ = gameManager.AddPipe();
+                bottomHandler.OnAddPipe();
+            }
+            else
+            {
+                Debug.Log("Rewarded ad failed! - " + id);
+            }
         }
 
         private void ShowTips()
@@ -125,6 +144,7 @@ namespace UI
                 await CreateWordCell(secondWord, secondWordLayout);
             }
             levelIsInitialized = true;
+            debugText.SetText(firstWord + "\n" + secondWord);
         }
 
         public void ShowWord(string word)
@@ -161,7 +181,6 @@ namespace UI
                 WordCell wordCell = Instantiate(wordCellPrefab, parent);
                 wordCell.transform.localScale = Vector3.one;
                 wordCell.SetLetter(word[i].ToString());
-                wordCell.Show();//debug
                 wordList.Add(wordCell);
             }
             await Task.Yield();

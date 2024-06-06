@@ -96,6 +96,8 @@ namespace Gameplay
                 eprubete.transform.localScale = Vector3.one;
                 eprubete.OnSelect += HandleLetterSelect;
                 eprubete.DispatchMoveComplete += MoveComplete;
+                eprubete.SaveWords(firstWord, secondWord);
+                eprubete.monitor = true;//debug
             }
             LayoutRebuilder.ForceRebuildLayoutImmediate(parent);
             await Task.Yield();
@@ -124,13 +126,6 @@ namespace Gameplay
                 Vector3 pos = new Vector3(eprubete.transform.position.x, eprubete.transform.position.y - 2f);
                 Instantiate(starsFX, pos, starsFX.transform.rotation);
                 gameplayScreen.ShowWord(verticalString);
-            }
-            else
-            {
-                foreach (ClickableEprubete ep in eprubeteList)
-                {
-                    ep.CheckEprubeteLetters(firstWord);
-                }
             }
             isMoving = false;
         }
@@ -211,10 +206,6 @@ namespace Gameplay
 
                 eprubete.AddLetterBall(letterBall);
                 letterBall.SetText(letter.ToString());
-            }
-            foreach (ClickableEprubete eprubete in eprubeteList)
-            {
-                eprubete.CheckEprubeteLetters(firstWord);
             }
             await Task.Yield();
         }

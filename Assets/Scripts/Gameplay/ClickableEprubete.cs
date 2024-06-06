@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,6 +26,11 @@ namespace Gameplay
         public event Action<ClickableEprubete> DispatchMoveComplete;
 
         private bool isLocked = false;
+
+        public bool monitor = false;
+
+        private string firstWord;
+        private string secondWord;
 
         private void Awake()
         {
@@ -61,12 +67,64 @@ namespace Gameplay
             cells.Add(cell);
         }
 
+        public void SaveWords(string firstWord, string secondWord)
+        {
+            this.firstWord = firstWord;
+            this.secondWord = secondWord;
+        }
+
+        private void CheckPlaces()
+        {
+            if (!monitor)
+            {
+                return;
+            }
+            foreach (LetterBall letterBall in letterBalls)
+            {
+                letterBall.SetActive(false);
+            }
+            for (int i = firstWord.Length - 1; i >= 0; i--)
+            {
+                for (int j = letterBalls.Count - 1; j >= 0; j--)
+                {
+                    if (letterBalls[j].Letter == firstWord[i].ToString())
+                    {
+                        letterBalls[j].SetActive(true);
+                    }
+                }
+            }
+        }
+
+        public bool CheckLetterPositions(string word, List<char> letters)
+        {
+            // Check if the length of the word matches the number of provided letters
+            if (word.Length != letters.Count)
+            {
+                Debug.LogError("Number of letters provided does not match the length of the word.");
+                return false;
+            }
+
+            // Iterate through each letter and compare it with the corresponding letter in the word
+            for (int i = 0; i < word.Length; i++)
+            {
+                if (word[i] != letters[i])
+                {
+                    // If any letter doesn't match, return false
+                    return false;
+                }
+            }
+
+            // If all letters match their corresponding positions, return true
+            return true;
+        }
+
         /// <summary>
         /// Adding letter to eprubete cell
         /// </summary>
         /// <param name="letterBall"></param>
         public void AddLetterBall(LetterBall letterBall)
         {
+            letterBall.SetActive(false);
             for (int i = cells.Count - 1; i >= 0; i--)
             {
                 if (cells[i].childCount == 0)
@@ -78,6 +136,7 @@ namespace Gameplay
                     return;
                 }
             }
+
             Debug.LogWarning("No empty cell found to move the letter ball to.");
         }
 
@@ -102,6 +161,7 @@ namespace Gameplay
                 letterBall.transform.SetParent(targetCell);
                 letterBall.transform.DOLocalMove(Vector3.zero, 0.25f).SetEase(Ease.OutExpo).OnComplete(() => DispatchMoveComplete?.Invoke(this));
                 letterBalls.Add(letterBall);
+                CheckPlaces();
             });
         }
 
@@ -142,23 +202,6 @@ namespace Gameplay
                 }
             }
             return verticalString;
-        }
-
-        public void CheckEprubeteLetters(string word)
-        {
-            //int k = 0;
-            //for (int i = 0; i < letterBalls.Count; i++)
-            //{
-            //    LetterBall ball = letterBalls[i];
-            //    ball.SetActive(false);
-            //    if (ball.Letter != word[k].ToString())
-            //    {
-            //        break;
-            //    }
-            //    Debug.Log(ball.Letter +"|"+ word[k]);
-            //    k++;
-            //    ball.SetActive(true);
-            //}
         }
 
         /// <summary>

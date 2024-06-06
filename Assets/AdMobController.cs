@@ -46,6 +46,12 @@ public class AdMobController : MonoBehaviour
             Debug.Log("[AdmobImpl] AdMob Initialized.");
             _initialized = true;
         });
+        ShowBannerAd(BannerShown);
+    }
+
+    private void BannerShown(bool success, string id)
+    {
+        Debug.Log("Banner initialized!");
     }
 
     /// <summary>
@@ -123,14 +129,14 @@ public class AdMobController : MonoBehaviour
 
         // Clean up the old ad before loading a new one.
         DestroyAd(AdType.Interstitial);
-        
+
         string adId = GetAdId(AdType.Interstitial);
 
         // create our request used to load the ad.
         var adRequest = new AdRequest();
 
         // send the request to load the ad.
-        InterstitialAd.Load(adId, adRequest, 
+        InterstitialAd.Load(adId, adRequest,
             (InterstitialAd ad, LoadAdError error) =>
             {
                 // if error is not null, the load request failed.
@@ -170,7 +176,7 @@ public class AdMobController : MonoBehaviour
                 };
 
                 bool isNull = ad == null;
-                bool isReady = ad != null? ad.CanShowAd() : false;
+                bool isReady = ad != null ? ad.CanShowAd() : false;
                 if (!isNull && isReady)
                 {
                     Debug.Log($"[AdmobImpl] InterstitialAd show started...");
@@ -258,7 +264,7 @@ public class AdMobController : MonoBehaviour
     {
         AdInfo info = null;
 #if UNITY_ANDROID
-        info = _testMode? _testInfoAndroid : _prodInfoAndroid;
+        info = _testMode ? _testInfoAndroid : _prodInfoAndroid;
 #elif UNITY_IOS
         info = _testMode? _testInfoIOS : _prodInfoIOS;
 #else

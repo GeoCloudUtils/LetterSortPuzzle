@@ -1,17 +1,11 @@
-using GoogleMobileAds.Api;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEditor.PackageManager;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.Purchasing;
 using UnityEngine.Purchasing.Extension;
 using Task = System.Threading.Tasks.Task;
 using UnityEngine.Purchasing.Security;
-using static UnityEngine.Networking.UnityWebRequest;
-using System.Text;
-using System.Security.Cryptography;
 using Unity.Services.Core;
 using Unity.Services.Core.Environments;
 
@@ -29,7 +23,7 @@ public enum PurchaseState
     Failed = 2
 }
 
-public class IAPController: MonoBehaviour, IDetailedStoreListener
+public class IAPController : MonoBehaviour, IDetailedStoreListener
 {
     private class Transaction
     {
@@ -81,7 +75,7 @@ public class IAPController: MonoBehaviour, IDetailedStoreListener
 
         _config = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
 
-        foreach(var elem in _products)
+        foreach (var elem in _products)
         {
             _config.AddProduct(elem.id, elem.type);
         }
@@ -124,7 +118,7 @@ public class IAPController: MonoBehaviour, IDetailedStoreListener
             Debug.LogError($"[IAPController] Not initialized.");
             return PurchaseState.Failed;
         }
-        else if(_initialized.HasValue && _initialized.Value == false)
+        else if (_initialized.HasValue && _initialized.Value == false)
         {
             Debug.LogError($"[IAPController] Not initialized(failed the intialization).");
             return PurchaseState.Failed;
@@ -153,7 +147,7 @@ public class IAPController: MonoBehaviour, IDetailedStoreListener
             await Task.Yield();
         }
 
-        PurchaseState result =  _currentTransaction.state;
+        PurchaseState result = _currentTransaction.state;
 
         _currentTransaction = null;
 
@@ -213,7 +207,7 @@ public class IAPController: MonoBehaviour, IDetailedStoreListener
 
     private bool CanPurchase()
     {
-        if(IsAppleStore())
+        if (IsAppleStore())
         {
             return _config.Configure<IAppleConfiguration>().canMakePayments;
         }
@@ -328,7 +322,7 @@ public class IAPController: MonoBehaviour, IDetailedStoreListener
             }
         }
 
-        if(isCurrTransaction)
+        if (isCurrTransaction)
             Debug.Log($"[IAPController] Purchase Success. Product:{product.definition.id};");
         else
             Debug.Log($"[IAPController] Purchase Success(but not current transaction, maybe diferred purchase), accepting as is. Product:{product.definition.id}");

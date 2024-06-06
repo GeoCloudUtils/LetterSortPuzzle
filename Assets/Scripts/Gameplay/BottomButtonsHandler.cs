@@ -45,6 +45,10 @@ public class BottomButtonsHandler : MonoBehaviour
     private void AddPipe()
     {
         OnAddClick?.Invoke();
+    }
+
+    public void OnAddPipe()
+    {
         addedPipes++;
         addPipeButton.gameObject.SetActive(false);
     }
